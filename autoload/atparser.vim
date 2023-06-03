@@ -205,28 +205,28 @@ endfunction
 
 "}}}
 function! atparser#ATTestAll() "{{{
-    echo system(printf("g++ %s -o ¬/tmp/cfparser_exec;
+    echo system(printf("g++ %s -o ~/tmp/cfparser_exec;
                         \cnt=0;
                         \for i in `ls %s/*.in | sed 's/\\.in$//'`; do
                         \   let cnt++;
                         \   echo \"\nTEST $cnt\";
-                        \   ¬/tmp/cfparser_exec < $i.in | diff -y - $i.out;
+                        \   ~/tmp/cfparser_exec < $i.in | diff -y - $i.out;
                         \done;
-                        \rm ¬/tmp/cfparser_exec",
+                        \rm ~/tmp/cfparser_exec",
         \ expand('%:p'), expand('%:p:h')))
 endfunction
 
 "}}}
 function! cfparser#CFRun() "{{{
-    echo system(printf("g++ %s -o ¬/tmp/cfparser_exec", expand('%s:p')))
+    echo system(printf("g++ %s -o ~/tmp/cfparser_exec", expand('%s:p')))
     let saved_shellcmdflag = &shellcmdflag
         set shellcmdflag+=il
     try
-        execute '!'. '¬/tmp/cfparser_exec'
+        execute '!'. '~/tmp/cfparser_exec'
     finally
         execute 'set shellcmdflag=' . saved_shellcmdflag
     endtry
-    call system("rm ¬/tmp/cfparser_exec")
+    call system("rm ~/tmp/cfparser_exec")
 endfunction
 
 "}}}
