@@ -52,6 +52,9 @@ let g:cf_pl_by_ext =    {'.cpp': g:cf_pl_gpp17,
 if !exists('g:cf_cookies_file')
     let g:cf_cookies_file = expand('~/.cf_cookies')
 endif
+if !exists('g:at_cookies_file')
+    let g:at_cookies_file = expand('~/.at_cookies')
+endif
 
 if !exists('g:cf_default_language')
     let g:cf_default_language = g:cf_pl_gpp17
@@ -66,7 +69,7 @@ if !exists('g:cf_locale')
 endif
 
 "}}}
-" Command definitions "{{{
+" Command definitions for Codeforces "{{{
 command! -nargs=0 CFLogin call cfparser#CFLogin()
 command! -nargs=0 CFLogout call cfparser#CFLogout()
 command! -nargs=0 CFWhoAmI call cfparser#CFWhoAmI()
@@ -79,7 +82,21 @@ command! -nargs=0 CFSubmit call cfparser#CFSubmit()
 command! -nargs=? CFLastSubmissions call cfparser#CFLastSubmissions(<args>)
 
 "}}}
-" Keys definitions "{{{
+
+" Command definitions for Atcoder "{{{
+command! -nargs=0 ATLogin call atparser#ATLogin()
+command! -nargs=0 ATLogout call atparser#ATLogout()
+command! -nargs=0 ATWhoAmI call atparser#ATWhoAmI()
+command! -nargs=0 ATProblemStatement call atparser#ATProblemStatement()
+command! -nargs=0 ATDownloadTests call atparser#ATDownloadTests()
+command! -nargs=0 ATClearTests call atparser#ATClearTests()
+command! -nargs=0 ATTestAll call atparser#ATTestAll()
+command! -nargs=0 ATRun call atparser#ATRun()
+command! -nargs=0 ATSubmit call atparser#ATSubmit()
+command! -nargs=? ATLastSubmissions call atparser#ATLastSubmissions(<args>)
+
+"}}}
+" Keys definitions: Codeforces "{{{
 nmap <leader>cfi :CFLogin<CR>
 nmap <leader>cfo :CFLogout<CR>
 nmap <leader>cfw :CFWhoAmI<CR>
@@ -91,4 +108,18 @@ nmap <leader>cfr :CFRun<CR>
 nmap <leader>cfs :CFSubmit<CR>
 nmap <leader>cfl :CFLastSubmissions<CR>
 "}}}
+
+" Keys definitions: Atcoder "{{{
+nmap <leader>ati :ATLogin<CR>
+nmap <leader>ato :ATLogout<CR>
+nmap <leader>atw :ATWhoAmI<CR>
+nmap <leader>atp :ATProblemStatement<CR>
+nmap <leader>atd :ATDownloadTests<CR>
+nmap <leader>atc :ATClearTests<CR>
+nmap <leader>att :ATTestAll<CR>
+nmap <leader>atr :ATRun<CR>
+nmap <leader>ats :ATSubmit<CR>
+nmap <leader>atl :ATLastSubmissions<CR>
+"}}}
+
 " vim:foldmethod=marker:foldlevel=0

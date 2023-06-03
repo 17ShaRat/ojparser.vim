@@ -1,7 +1,7 @@
 " Variables "{{{
 let s:at_host = 'atcoder.jp'
 let s:at_proto = 'https'
-let s:cf_path_regexp = '\([0-9]\+\)\/\?\([a-zA-Z][0-9]*\)\/\?[^/.]*\(\.[^.]\+\)$'
+let s:at_path_regexp = '\([0-9]\+\)\/\?\([a-zA-Z][0-9]*\)\/\?[^/.]*\(\.[^.]\+\)$'
 
 "}}}
 
@@ -51,13 +51,13 @@ function! atparser#ATParseTests(data) "{{{
 endfunction
 
 "}}}	
-function! cfparser#CFGetTests(contest, problem) "{{{
-    let cf_response = system(printf("curl --silent --cookie-jar %s --cookie %s '%s://%s/contest/%s/problem/%s'", g:cf_cookies_file, g:cf_cookies_file, s:cf_proto, s:cf_host, a:contest, a:problem))
+function! atparser#ATGetTests(contest, problem) "{{{
+    let at_response = system(printf("curl --silent --cookie-jar %s --cookie %s '%s://%s/contest/%s/problem/%s'", g:at_cookies_file, g:at_cookies_file, s:at_proto, s:at_host, a:contest, a:problem))
 	return cfparser#CFParseTests(cf_response)
 endfunction
 
 "}}}
-function! cfparser#CFApplySubstitutions(text, text_substitutions) "{{{
+function! atparser#ATApplySubstitutions(text, text_substitutions) "{{{
     let l:text = a:text
     for [pat, sub] in items(a:text_substitutions)
         let l:text = substitute(l:text, pat, sub, "g")
@@ -66,16 +66,16 @@ function! cfparser#CFApplySubstitutions(text, text_substitutions) "{{{
 endfunction
 
 "}}}
-function! cfparser#CFGetToken(page) "{{{
+function! atparser#ATGetToken(page) "{{{
     let g:ppage = a:page
     let match = matchlist(a:page, 'name=''csrf_token'' value=''\([^'']\{-}\)''')
     return match[1]
 endfunction
 
 "}}}
-function! cfparser#CFDownloadTests() "{{{
+function! atparser#ATDownloadTests() "{{{
     let path = expand('%:p')
-    let match = matchlist(path, s:cf_path_regexp)
+    let match = matchlist(path, s:at_path_regexp)
     
     if empty(match)        
         echom "download: file name not recognized"
@@ -83,12 +83,12 @@ function! cfparser#CFDownloadTests() "{{{
         let contest = match[1]
         let problem = match[2]
         echom printf("downloading tests for %s/%s...", contest, problem)
-        let tests = cfparser#CFGetTests(contest, problem)
+        let tests = atparser#ATGetTests(contest, problem)
 
 		let cnt = 0
         for test in tests
-			silent call cfparser#CFLog(test[0], printf(expand('%:p:h') . "/%d.in", cnt))
-			silent call cfparser#CFLog(test[1], printf(expand('%:p:h') . "/%d.out", cnt))
+			silent call atparser#ATLog(test[0], printf(expand('%:p:h') . "/%d.in", cnt))
+			silent call atparser#ATLog(test[1], printf(expand('%:p:h') . "/%d.out", cnt))
             let cnt += 1
 		endfor	
         echon "\r\r"
@@ -97,7 +97,7 @@ function! cfparser#CFDownloadTests() "{{{
 endfunction
 
 "}}}
-function! cfparser#CFClearTests() "{{{
+function! atparser#ATClearTests() "{{{
     echo system("rm *.in *.out")
     echom "cleared tests"
 endfunction
@@ -125,31 +125,31 @@ function! atparser#ATLogin() "{{{
 endfunction
 
 "}}}
-function! cfparser#CFLogout() "{{{
-    if filereadable(g:cf_cookies_file)
-        call delete(g:cf_cookies_file)
+function! atparser#ATLogout() "{{{
+    if filereadable(g:at_cookies_file)
+        call delete(g:at_cookies_file)
     endif
     echom "logout: ok"
 endfunction
 
 "}}}
-function! cfparser#CFWhoAmI() "{{{
-    let user = cfparser#CFLoggedInAs()
+function! atparser#ATWhoAmI() "{{{
+    let user = atparser#ATLoggedInAs()
     if empty(user)
         echom ("not logged in")
     else
-        echom printf("logged in as %s", cfparser#CFLoggedInAs())
+        echom printf("logged in as %s", atparser#ATLoggedInAs())
     endif
 endfunction
 
 "}}}
-function! cfparser#CFSubmit() "{{{
-    if empty(cfparser#CFLoggedInAs()) 
-        call cfparser#CFLogin()
+function! atparser#ATSubmit() "{{{
+    if empty(atparser#ATLoggedInAs()) 
+        call atparser#ATLogin()
     endif
 
     let path = expand('%:p')
-    let match = matchlist(path, s:cf_path_regexp)
+    let match = matchlist(path, s:at_path_regexp)
 
     if empty(match)
         echon "\r\r"
@@ -204,35 +204,35 @@ function! cfparser#CFLastSubmissions(...) "{{{
 endfunction
 
 "}}}
-function! cfparser#CFTestAll() "{{{
-    echo system(printf("g++ %s -o /tmp/cfparser_exec;
+function! atparser#ATTestAll() "{{{
+    echo system(printf("g++ %s -o ¬/tmp/cfparser_exec;
                         \cnt=0;
                         \for i in `ls %s/*.in | sed 's/\\.in$//'`; do
                         \   let cnt++;
                         \   echo \"\nTEST $cnt\";
-                        \   /tmp/cfparser_exec < $i.in | diff -y - $i.out;
+                        \   ¬/tmp/cfparser_exec < $i.in | diff -y - $i.out;
                         \done;
-                        \rm /tmp/cfparser_exec",
+                        \rm ¬/tmp/cfparser_exec",
         \ expand('%:p'), expand('%:p:h')))
 endfunction
 
 "}}}
 function! cfparser#CFRun() "{{{
-    echo system(printf("g++ %s -o /tmp/cfparser_exec", expand('%s:p')))
+    echo system(printf("g++ %s -o ¬/tmp/cfparser_exec", expand('%s:p')))
     let saved_shellcmdflag = &shellcmdflag
         set shellcmdflag+=il
     try
-        execute '!'. '/tmp/cfparser_exec'
+        execute '!'. '¬/tmp/cfparser_exec'
     finally
         execute 'set shellcmdflag=' . saved_shellcmdflag
     endtry
-    call system("rm /tmp/cfparser_exec")
+    call system("rm ¬/tmp/cfparser_exec")
 endfunction
 
 "}}}
-function! cfparser#CFProblemStatement() "{{{
+function! atparser#ATProblemStatement() "{{{
     let path = expand('%:p')
-    let match = matchlist(path, s:cf_path_regexp)
+    let match = matchlist(path, s:at_path_regexp)
 
     if empty(match)
         echom "download: file name not recognized"
@@ -240,8 +240,8 @@ function! cfparser#CFProblemStatement() "{{{
         let contest = match[1]
         let problem = match[2]
 
-		let cf_response = system(printf("curl --silent --cookie-jar %s --cookie %s '%s://%s/contest/%s/problem/%s?locale=%s'", g:cf_cookies_file, g:cf_cookies_file, s:cf_proto, s:cf_host, contest, problem, g:cf_locale))
-        let cf_response = substitute(cf_response, '\r', '', "g")
+		let at_response = system(printf("curl --silent --cookie-jar %s --cookie %s '%s://%s/contest/%s/problem/%s?locale=%s'", g:at_cookies_file, g:at_cookies_file, s:at_proto, s:at_host, contest, problem, g:at_locale))
+        let at_response = substitute(at_response, '\r', '', "g")
         let statement_regex = '<div class="problem-statement">\(.\{-}\)<script type="text\/javascript">'
     	let cf_response = matchlist(cf_response, statement_regex)[1]
         let cf_response = substitute(cf_response,'<br[^>]\{-}>', '\n', "g")
