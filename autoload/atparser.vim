@@ -1,11 +1,11 @@
 " Variables "{{{
-let s:cf_host = 'codeforces.com'
-let s:cf_proto = 'https'
+let s:at_host = 'atcoder.jp'
+let s:at_proto = 'https'
 let s:cf_path_regexp = '\([0-9]\+\)\/\?\([a-zA-Z][0-9]*\)\/\?[^/.]*\(\.[^.]\+\)$'
 
 "}}}
 
-function! cfparser#CFLog(message, file) "{{{
+function! atparser#ATLog(message, file) "{{{
     " from http://stackoverflow.com/questions/23089736/how-do-i-append-text-to-a-file-with-vim-script
 	new
 	setlocal buftype=nofile bufhidden=hide noswapfile nobuflisted
@@ -16,27 +16,18 @@ function! cfparser#CFLog(message, file) "{{{
 endfunction
 
 "}}}
-function! cfparser#CFLoggedInAs() "{{{
-    let cf_response = system(printf("curl --silent --cookie-jar %s --cookie %s '%s://%s/' ", g:cf_cookies_file, g:cf_cookies_file, s:cf_proto, s:cf_host))
-    if !empty(matchstr(cf_response, "<a href=\"/[a-z0-9]*/logout\">"))
-        return matchlist(cf_response, "<a href=\"/profile/\\([^\"]*\\)\">")[1]
+function! atparser#ATLoggedInAs() "{{{
+    let at_response = system(printf("curl --silent --cookie-jar %s --cookie %s '%s://%s/' ", g:at_cookies_file, g:at_cookies_file, s:at_proto, s:at_host))
+    if !empty(matchstr(at_response, "<a href=\"/[a-z0-9]*/logout\">"))
+        return matchlist(at_response, "<a href=\"/users/\\([^\"]*\\)\">")[1]
     else
         return ""
     endif
 endfunction
 
 "}}}
-function! cfparser#CFLoggedInAs() "{{{
-    let cf_response = system(printf("curl --silent --cookie-jar %s --cookie %s '%s://%s/' ", g:cf_cookies_file, g:cf_cookies_file, s:cf_proto, s:cf_host))
-    if !empty(matchstr(cf_response, "<a href=\"/[a-z0-9]*/logout\">"))
-        return matchlist(cf_response, "<a href=\"/profile/\\([^\"]*\\)\">")[1]
-    else
-        return ""
-    endif
-endfunction
 
-"}}}
-function! cfparser#CFParseTests(data) "{{{
+function! atparser#ATParseTests(data) "{{{
     let input_regex = '<div class=\"input\">.\{-}<pre>\n*\(.\{-}\)</pre></div>'
     let output_regex = '<div class=\"output\">.\{-}<pre>\n*\(.\{-}\)</pre></div>'
     let ret = []
@@ -112,21 +103,21 @@ function! cfparser#CFClearTests() "{{{
 endfunction
 
 "}}}
-function! cfparser#CFLogin() "{{{
-    let s:cf_uname = input('username: ')
-    let s:cf_passwd = inputsecret('password: ')
+function! atparser#ATLogin() "{{{
+    let s:at_uname = input('username: ')
+    let s:at_passwd = inputsecret('password: ')
     let remember = input('remember? [Y/n] ')
     if remember ==? "Y"
-        let s:cf_remember = 1
+        let s:at_remember = 1
     else
-        let s:cf_remember = 0
+        let s:at_remember = 0
     endif
 
-    let cf_response = system(printf("curl --silent --cookie-jar %s '%s://%s/enter'", g:cf_cookies_file, s:cf_proto, s:cf_host))
-    let csrf_token = cfparser#CFGetToken(cf_response)
-    let cf_response = system(printf("curl --location --silent --cookie-jar %s --cookie %s --data 'action=enter&handleOrEmail=%s&remember=%s&csrf_token=%s' --data-urlencode 'password=%s' '%s://%s/enter'", g:cf_cookies_file, g:cf_cookies_file, s:cf_uname, s:cf_remember, csrf_token, s:cf_passwd, s:cf_proto, s:cf_host))
+    let at_response = system(printf("curl --silent --cookie-jar %s '%s://%s/login'", g:at_cookies_file, s:at_proto, s:at_host))
+    let csrf_token = atparser#ATGetToken(at_response)
+    let at_response = system(printf("curl --location --silent --cookie-jar %s --cookie %s --data 'action=enter&username=%s&remember=%s&csrf_token=%s' --data-urlencode 'password=%s' '%s://%s/enter'", g:at_cookies_file, g:at_cookies_file, s:at_uname, s:at_remember, csrf_token, s:at_passwd, s:at_proto, s:at_host))
     echon "\r\r"
-    if empty(matchstr(cf_response, '"error for__password"'))
+    if empty(matchstr(at_response, '"error for__password"'))
         echom "login: ok"
     else
         echom "login: failed"
